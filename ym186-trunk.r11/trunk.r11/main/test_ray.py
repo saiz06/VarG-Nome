@@ -1,9 +1,0 @@
-import ray
-ray.init(address='ray://34.221.168.40:6379')
-
-@ray.remote
-def f(x):
-    return x * x
-
-futures = [f.remote(i) for i in range(4)]
-print(ray.get(futures)) # [0, 1, 4, 9]

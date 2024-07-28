@@ -7,36 +7,27 @@
 import re
 import os #used with strip(os.linesep)
 import gzip
-import ray
 
 
-@ray.remote
-def extract_varaiations_from_body_vcf(BASE_PATH, vcf_header_and_body_folder_name):
-	vcf_body_varaitions_path = os.path.join(BASE_PATH, 'vcf_body_varaitions')
-	try:
-		os.mkdir(vcf_body_varaitions_path)
-	except FileExistsError:
-		print("Folder Already exists")
+#Save to these files:
+counter = open("vcf_chr_record_count.txt","w")
 
-	#Save to these files:
-	counter = open(os.path.join(vcf_body_varaitions_path, "vcf_chr_record_count.txt"),"w")
+file_variable=""
+prev_chr=""
+chrom_list = []#contains names of chr
+chrom_file_list = [] #contains names of files to be created
+var_counter = 0
+#print("counter is 0")
 
-	file_variable=""
-	prev_chr=""
-	chrom_list = []#contains names of chr
-	chrom_file_list = [] #contains names of files to be created
-	var_counter = 0
-	#print("counter is 0")
+#flag 
+new_chr_flag = 0
+first_line_flag = 0
+end_of_file_flag = 0
 
-	#flag 
-	new_chr_flag = 0
-	first_line_flag = 0
-	end_of_file_flag = 0
-
-	with open(os.path.join(BASE_PATH, vcf_header_and_body_folder_name, 'vcf_body.vcf'), 'r+') as inputvcf:
-	# with open('sample.txt', 'r+') as inputvcf:
-		for line in inputvcf:
-			chrom_var = line.split()[0]
+with open('vcf_body.vcf', 'r+') as inputvcf:
+#with open('sample.txt', 'r+') as inputvcf:
+        for line in inputvcf:
+		chrom_var = line.split()[0]
 		
 		if not chrom_list:#empty list
 			first_flag=1
@@ -77,13 +68,16 @@ def extract_varaiations_from_body_vcf(BASE_PATH, vcf_header_and_body_folder_name
 			chrom_list.append(chrom_var)
 			fname = "VCF_Chr"+chrom_var+"_body.csv"
 			file_variable = "Chr"+chrom_var
-			file_variable = open(os.path.join(vcf_body_varaitions_path, fname),"w")
+			file_variable = open(fname,"w")
 			#print("file opened with name: "+fname)
 			
 			#print("====Start of chr#: "+chrom_var)
 			file_variable.write(str(line))
 			var_counter += 1
 			#print("count: "+str(var_counter))
+			
+			
+		
 		
 		#not unique
 		else:
@@ -92,10 +86,12 @@ def extract_varaiations_from_body_vcf(BASE_PATH, vcf_header_and_body_folder_name
 			file_variable.write(str(line))
 			var_counter += 1
 			#print("count: "+str(var_counter))
+		#
 		
 			
 			
-if __name__=='__main__':
-    extract_varaiations_from_body_vcf('/Users/lawrence/Documents/Lawrence/data-api', 'vcf_header_and_body')
+			 
+			
+		
 			
 
