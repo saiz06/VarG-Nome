@@ -1,0 +1,1040 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Example API",
+    "version": "1.0",
+    "description": "This is the API for VarG-Nome Service",
+    
+    "contact": {
+      "email": "sanna.aizad@gmail.com",
+      "name": "Brookes Lab, University of Leicester"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://similarity.cafevariome.org",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Similarity",
+      "description": "These endpoints returns a series of terms that has enough similarity to the query terms, as HPO terms."
+    },
+    {
+      "name": "Expansion",
+      "description": "These endpoints traverse the ontology tree of the given type, returning all children of the given terms."
+    },
+    {
+      "name": "Mapping",
+      "description": "These endpoints map the terms from one set to another."
+    }
+  ],
+  "paths": {
+    "/similarity/hpo": {
+      "post": {
+        "tags": [
+          "Similarity"
+        ],
+        "summary": "HPO Similarity Query",
+        "description": "Returns a series of terms that has enough similarity to the query terms, as HPO terms.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/expand"
+          },
+          {
+            "$ref": "#/components/parameters/resultThreshold"
+          },
+          {
+            "$ref": "#/components/parameters/ic"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HPOSimQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The list of similar terms.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HPOSimResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/similarity/ordo": {
+      "post": {
+        "tags": [
+          "Similarity"
+        ],
+        "summary": "ORDO Similarity Query",
+        "description": "Returns a series of terms that has enough similarity to the query terms, as ORDO terms.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/expand"
+          },
+          {
+            "$ref": "#/components/parameters/resultThreshold"
+          },
+          {
+            "$ref": "#/components/parameters/ic"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ORDOSimQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The list of similar terms.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ORDOSimResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/expand/hpo": {
+      "post": {
+        "tags": [
+          "Expansion"
+        ],
+        "summary": "HPO Expansion Query",
+        "description": "Returns all children of the given terms, as HPO terms.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/depth"
+          },
+          {
+            "$ref": "#/components/parameters/resultThreshold"
+          },
+          {
+            "$ref": "#/components/parameters/ic"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HPOExpandQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The list of children terms.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HPOExpandResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/expand/ordo": {
+      "post": {
+        "tags": [
+          "Expansion"
+        ],
+        "summary": "ORDO Expansion Query",
+        "description": "Returns all children of the given terms, as ORDO terms.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/depth"
+          },
+          {
+            "$ref": "#/components/parameters/resultThreshold"
+          },
+          {
+            "$ref": "#/components/parameters/ic"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ORDOExpandQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The list of children terms.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ORDOExpandResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/map/{termType}": {
+      "post": {
+        "tags": [
+          "Mapping"
+        ],
+        "summary": "Map Term Sets",
+        "description": "Map the terms from one set to another.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/termType"
+          },
+          {
+            "$ref": "#/components/parameters/matchScale"
+          },
+          {
+            "$ref": "#/components/parameters/frequency"
+          },
+          {
+            "$ref": "#/components/parameters/relationTypes"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MapTermQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The list of mapped terms.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MapOrdoHpoResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MapHpoOrdoResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "expand": {
+        "name": "expand",
+        "in": "query",
+        "description": "Whether to expand the given terms or not.",
+        "required": false,
+        "schema": {
+          "type": "boolean",
+          "default": false
+        },
+        "example": false,
+        "allowEmptyValue": false
+      },
+      "resultThreshold": {
+        "name": "resultThreshold",
+        "in": "query",
+        "description": "The max amount of terms to be contained in the result. 0 for no limit.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "example": 0,
+        "allowEmptyValue": false
+      },
+      "ic": {
+        "name": "ic",
+        "in": "query",
+        "description": "Whether to return the information content of the terms.",
+        "required": false,
+        "schema": {
+          "type": "boolean",
+          "default": false
+        },
+        "example": false,
+        "allowEmptyValue": false
+      },
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "description": "The depth of the ontology tree to be traversed. 0 for no limit.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 3
+        },
+        "example": 3,
+        "allowEmptyValue": false
+      },
+      "termType": {
+        "name": "termType",
+        "in": "path",
+        "description": "The original type of the term. Case insensitive.",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/TermType"
+        },
+        "example": "hpo",
+        "allowEmptyValue": false
+      },
+      "matchScale": {
+        "name": "match_scale",
+        "in": "query",
+        "description": "The minimum scale on the HPO IC against ORDO terms that is required to match.",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        },
+        "example": 1,
+        "allowEmptyValue": false
+      },
+      "frequency": {
+        "name": "frequency",
+        "in": "query",
+        "description": "The minimum frequency of the HPO terms that is required to match.",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 0
+        },
+        "example": 0,
+        "allowEmptyValue": false
+      },
+      "relationTypes": {
+        "name": "relation_types",
+        "in": "query",
+        "description": "The types of the relations of OMIM mappings.",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "BTNT",
+              "NTBT",
+              "E",
+              "ND"
+            ]
+          }
+        },
+        "example": [
+          "BTNT",
+          "NTBT"
+        ],
+        "allowEmptyValue": false
+      }
+    },
+    "schemas": {
+      "HPOSimQuery": {
+        "type": "object",
+        "properties": {
+          "hpoTerms": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^HP:[0-9]{7}$"
+            },
+            "description": "The ids of the HPO terms."
+          },
+          "threshold": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 1,
+            "description": "The threshold for the similarity score of the results. 1 for exact match."
+          }
+        },
+        "required": [
+          "hpoTerms"
+        ],
+        "example": {
+          "hpoTerms": [
+            "HP:0001258",
+            "HP:0007020"
+          ],
+          "threshold": 0.5
+        }
+      },
+      "ORDOSimQuery": {
+        "type": "object",
+        "properties": {
+          "ordoTerms": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^ORPHA:[0-9]{1,6}$"
+            },
+            "description": "The ids of the ORDO terms."
+          },
+          "matchScale": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 1,
+            "description": "The minimum scale on the HPO IC against ORDO terms that is required to match."
+          },
+          "threshold": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.9,
+            "description": "The threshold for the similarity score of the results. 1 for exact match."
+          },
+          "frequency": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 0,
+            "description": "The minimum frequency of the HPO terms that is required to match."
+          }
+        },
+        "required": [
+          "ordoTerms"
+        ],
+        "example": {
+          "ordoTerms": [
+            "ORPHA:79102"
+          ],
+          "matchScale": 1,
+          "threshold": 0.9,
+          "frequency": 0
+        }
+      },
+      "HPOSimResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^HP:[0-9]{7}$",
+              "description": "The id of the original HPO term."
+            },
+            "similarIDs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^HP:[0-9]{7}$",
+                "description": "The ids of the similar HPO terms."
+              }
+            }
+          },
+          "required": [
+            "id",
+            "similarIDs"
+          ],
+          "example": {
+            "id": "HP:0001258",
+            "similarIDs": [
+              "HP:0002179",
+              "HP:0002061",
+              "HP:0002064",
+              "HP:0011099",
+              "HP:0002510",
+              "HP:0001257",
+              "HP:0001276",
+              "HP:0003808",
+              "HP:0002301",
+              "HP:0001264",
+              "HP:0010551",
+              "HP:0002445",
+              "HP:0010549",
+              "HP:0002313",
+              "HP:0002493",
+              "HP:0007020",
+              "HP:0040293",
+              "HP:0011442",
+              "HP:0001285",
+              "HP:0007199",
+              "HP:0200072",
+              "HP:0007256",
+              "HP:0001269",
+              "HP:0010550",
+              "HP:0002273",
+              "HP:0012194",
+              "HP:0004374",
+              "HP:0030182",
+              "HP:0040292",
+              "HP:0003487",
+              "HP:0002385"
+            ]
+          }
+        }
+      },
+      "ORDOSimResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "orphaID": {
+              "type": "string",
+              "pattern": "^ORPHA:[0-9]{1,6}$",
+              "description": "The id of the original ORDO term."
+            },
+            "hpoIDs": {
+              "type": "object",
+              "properties": {
+                "Excluded": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^HP:[0-9]{7}$",
+                    "description": "The ids of the excluded HPO terms."
+                  }
+                },
+                "Obligated": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^HP:[0-9]{7}$",
+                    "description": "The ids of the obligated HPO terms."
+                  }
+                },
+                "Optional": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^HP:[0-9]{7}$",
+                    "description": "The ids of the optional HPO terms."
+                  }
+                }
+              }
+            },
+            "similarHPOs": {
+              "type": "object",
+              "properties": {
+                "Excluded": {
+                  "$ref": "#/components/schemas/HPOSimResponse"
+                },
+                "Obligated": {
+                  "$ref": "#/components/schemas/HPOSimResponse"
+                },
+                "Optional": {
+                  "$ref": "#/components/schemas/HPOSimResponse"
+                }
+              }
+            }
+          },
+          "required": [
+            "orphaID",
+            "hpoIDs",
+            "similarHPOs"
+          ],
+          "example": {
+            "hpoIDs": {
+              "Excluded": [
+                "HP:0006670",
+                "HP:0002486",
+                "HP:0003134"
+              ],
+              "Obligated": [
+                "HP:0012726",
+                "HP:0008153",
+                "HP:0000836"
+              ],
+              "Optional": [
+                "HP:0008285",
+                "HP:0011786",
+                "HP:0011785",
+                "HP:0003694",
+                "HP:0003752",
+                "HP:0011706",
+                "HP:0005165",
+                "HP:0012364",
+                "HP:0002203",
+                "HP:0012240",
+                "HP:0100647",
+                "HP:0011998",
+                "HP:0001663",
+                "HP:0011784",
+                "HP:0009020",
+                "HP:0002917",
+                "HP:0002445",
+                "HP:0000016",
+                "HP:0008180",
+                "HP:0002153",
+                "HP:0001657",
+                "HP:0003201",
+                "HP:0001962",
+                "HP:0003552",
+                "HP:0003470",
+                "HP:0003394",
+                "HP:0007340",
+                "HP:0000975",
+                "HP:0004303",
+                "HP:0000597",
+                "HP:0001265",
+                "HP:0003457",
+                "HP:0001513",
+                "HP:0002019",
+                "HP:0001824",
+                "HP:0001337"
+              ]
+            },
+            "orphaID": "ORPHA:79102",
+            "similarHPOs": {
+              "Excluded": [
+                {
+                  "id": "HP:0003134",
+                  "similarIDs": [
+                    "HP:0045010",
+                    "HP:0032120",
+                    "HP:0030177",
+                    "HP:0040129",
+                    "HP:0040131",
+                    "HP:0003431",
+                    "HP:0000762"
+                  ]
+                },
+                {
+                  "id": "HP:0006670",
+                  "similarIDs": [
+                    "HP:0006673"
+                  ]
+                }
+              ],
+              "Obligated": [
+                {
+                  "id": "HP:0008153",
+                  "similarIDs": [
+                    "HP:0003768"
+                  ]
+                }
+              ],
+              "Optional": [
+                {
+                  "id": "HP:0000597",
+                  "similarIDs": [
+                    "HP:0000602"
+                  ]
+                },
+                {
+                  "id": "HP:0000975",
+                  "similarIDs": [
+                    "HP:0007550",
+                    "HP:0025276"
+                  ]
+                },
+                {
+                  "id": "HP:0001265",
+                  "similarIDs": [
+                    "HP:0001315"
+                  ]
+                },
+                {
+                  "id": "HP:0001513",
+                  "similarIDs": [
+                    "HP:0004324"
+                  ]
+                },
+                {
+                  "id": "HP:0001657",
+                  "similarIDs": [
+                    "HP:0031547",
+                    "HP:0003115",
+                    "HP:0500015"
+                  ]
+                },
+                {
+                  "id": "HP:0001824",
+                  "similarIDs": [
+                    "HP:0004326"
+                  ]
+                },
+                {
+                  "id": "HP:0002153",
+                  "similarIDs": [
+                    "HP:0011042"
+                  ]
+                },
+                {
+                  "id": "HP:0002917",
+                  "similarIDs": [
+                    "HP:0004921"
+                  ]
+                },
+                {
+                  "id": "HP:0003457",
+                  "similarIDs": [
+                    "HP:0003458",
+                    "HP:0003445"
+                  ]
+                },
+                {
+                  "id": "HP:0003752",
+                  "similarIDs": [
+                    "HP:0010547"
+                  ]
+                },
+                {
+                  "id": "HP:0005165",
+                  "similarIDs": [
+                    "HP:0031593"
+                  ]
+                },
+                {
+                  "id": "HP:0009020",
+                  "similarIDs": [
+                    "HP:0003750"
+                  ]
+                },
+                {
+                  "id": "HP:0011706",
+                  "similarIDs": [
+                    "HP:0011708",
+                    "HP:0011707"
+                  ]
+                },
+                {
+                  "id": "HP:0011784",
+                  "similarIDs": [
+                    "HP:0100647"
+                  ]
+                },
+                {
+                  "id": "HP:0012240",
+                  "similarIDs": [
+                    "HP:0009058"
+                  ]
+                },
+                {
+                  "id": "HP:0100647",
+                  "similarIDs": [
+                    "HP:0011784"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "description": "The list of similar terms, grouped by the original ORDO terms. They are divided into three categories: Excluded, Obligated, and Optional."
+      },
+      "HPOExpandQuery": {
+        "type": "object",
+        "properties": {
+          "hpoTerms": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^HP:[0-9]{7}$"
+            },
+            "description": "The ids of the HPO terms."
+          }
+        },
+        "required": [
+          "hpoTerms"
+        ],
+        "example": {
+          "hpoTerms": [
+            "HP:0001258"
+          ]
+        }
+      },
+      "ORDOExpandQuery": {
+        "type": "object",
+        "properties": {
+          "ordoTerms": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^ORPHA:[0-9]{1,6}$"
+            },
+            "description": "The ids of the ORDO terms."
+          }
+        },
+        "required": [
+          "ordoTerms"
+        ],
+        "example": {
+          "ordoTerms": [
+            "ORPHA:1",
+            "ORPHA:2"
+          ]
+        }
+      },
+      "HPOExpandResponse": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "pattern": "^HP:[0-9]{7}$",
+          "description": "The ids of the HPO terms."
+        },
+        "description": "The list of children terms.",
+        "example": [
+          "HP:0001258",
+          "HP:0007020"
+        ]
+      },
+      "ORDOExpandResponse": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "pattern": "^ORPHA:[0-9]{1,6}$",
+          "description": "The ids of the ORDO terms.",
+          "example": [
+            "ORPHA:3",
+            "ORPHA:4"
+          ]
+        },
+        "description": "The list of children terms.",
+        "example": [
+          "ORPHA:3",
+          "ORPHA:4"
+        ]
+      },
+      "MapTermQuery": {
+        "type": "object",
+        "properties": {
+          "terms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The ids of the terms to be mapped."
+          },
+          "targetType": {
+            "$ref": "#/components/schemas/TermType",
+            "description": "The type of the terms to be mapped to. Case insensitive."
+          }
+        },
+        "required": [
+          "terms",
+          "targetType"
+        ],
+        "example": {
+          "terms": [
+            "HP:0000001",
+            "HP:0000002"
+          ],
+          "targetType": "ordo"
+        }
+      },
+      "MapOrdoHpoResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "orphaID": {
+              "type": "string",
+              "pattern": "^ORPHA:[0-9]{1,6}$",
+              "description": "The id of the original ORDO term."
+            },
+            "hpoIDs": {
+              "type": "object",
+              "properties": {
+                "Excluded": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^HP:[0-9]{7}$",
+                    "description": "The ids of the excluded HPO terms."
+                  }
+                },
+                "Obligated": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^HP:[0-9]{7}$",
+                    "description": "The ids of the obligated HPO terms."
+                  }
+                },
+                "Optional": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^HP:[0-9]{7}$",
+                    "description": "The ids of the optional HPO terms."
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "orphaID",
+            "hpoIDs"
+          ],
+          "example": {
+            "hpoIDs": {
+              "Excluded": [
+                "HP:0006670",
+                "HP:0002486",
+                "HP:0003134"
+              ],
+              "Obligated": [
+                "HP:0012726",
+                "HP:0008153",
+                "HP:0000836"
+              ],
+              "Optional": [
+                "HP:0008285",
+                "HP:0011786",
+                "HP:0011785",
+                "HP:0003694",
+                "HP:0003752",
+                "HP:0011706",
+                "HP:0005165",
+                "HP:0012364",
+                "HP:0002203",
+                "HP:0012240",
+                "HP:0100647",
+                "HP:0011998",
+                "HP:0001663",
+                "HP:0011784",
+                "HP:0009020",
+                "HP:0002917",
+                "HP:0002445",
+                "HP:0000016",
+                "HP:0008180",
+                "HP:0002153",
+                "HP:0001657",
+                "HP:0003201",
+                "HP:0001962",
+                "HP:0003552",
+                "HP:0003470",
+                "HP:0003394",
+                "HP:0007340",
+                "HP:0000975",
+                "HP:0004303",
+                "HP:0000597",
+                "HP:0001265",
+                "HP:0003457",
+                "HP:0001513",
+                "HP:0002019",
+                "HP:0001824",
+                "HP:0001337"
+              ]
+            },
+            "orphaID": "ORPHA:79102"
+          }
+        },
+        "description": "The list of expanded terms, grouped by the original ORDO terms. They are divided into three categories: Excluded, Obligated, and Optional."
+      },
+      "MapHpoOrdoResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "hpoID": {
+              "type": "string",
+              "pattern": "^HP:[0-9]{7}$",
+              "description": "The id of the original HPO term."
+            },
+            "orphaIDs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^ORPHA:[0-9]{1,6}$",
+                "description": "The ids of the ORDO terms."
+              }
+            }
+          },
+          "required": [
+            "hpoID",
+            "orphaIDs"
+          ],
+          "example": {
+            "hpoID": "HP:0001258",
+            "orphaIDs": [
+              "ORPHA:896",
+              "ORPHA:306617",
+              "ORPHA:2072",
+              "ORPHA:167",
+              "ORPHA:1215",
+              "ORPHA:309282",
+              "ORPHA:168577",
+              "ORPHA:401800",
+              "ORPHA:477673",
+              "ORPHA:401795",
+              "ORPHA:98673",
+              "ORPHA:415",
+              "ORPHA:100986",
+              "ORPHA:83629",
+              "ORPHA:320396",
+              "ORPHA:100988",
+              "ORPHA:100994",
+              "ORPHA:139480",
+              "ORPHA:320411",
+              "ORPHA:101005",
+              "ORPHA:171629",
+              "ORPHA:251282",
+              "ORPHA:320380",
+              "ORPHA:459056",
+              "ORPHA:101007",
+              "ORPHA:100996",
+              "ORPHA:101004",
+              "ORPHA:101003",
+              "ORPHA:357043",
+              "ORPHA:53583",
+              "ORPHA:139578",
+              "ORPHA:369929",
+              "ORPHA:329475",
+              "ORPHA:431329",
+              "ORPHA:293168",
+              "ORPHA:2824",
+              "ORPHA:1891",
+              "ORPHA:847",
+              "ORPHA:2466"
+            ]
+          }
+        }
+      },
+      "TermType": {
+        "type": "string",
+        "enum": [
+          "hpo",
+          "ordo",
+          "reactome",
+          "omim",
+          "pathway",
+          "reaction",
+          "gene",
+          "protein_effect"
+        ],
+        "description": "The type of the term. Case insensitive."
+      }
+    }
+  }
+}
